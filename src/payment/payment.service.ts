@@ -19,23 +19,27 @@ export class PaymentService {
     return hash.digest("base64");
   }
 
-  generatePaymentData({ amount, currency, orderId }: CreatePaymentDto) {
+  generatePaymentData({
+    amount,
+    currency,
+    orderId,
+    description,
+  }: CreatePaymentDto) {
     const server_url = this.configService.get<string>(
       "LIQPAY_SERVER_SUCCESS_URL",
     );
     const result_url = this.configService.get<string>(
       "LIQPAY_RESULT_SUCCESS_URL",
     );
-    console.log("Server : ", server_url);
+
     const data = {
       version: 3,
       public_key: this.publicKey,
       action: "pay",
       amount,
       currency,
-      description: "Оплата послуги у Футбольному проекті",
+      description,
       order_id: orderId,
-      // result_url: "https://твій-домен.com/success",
       result_url: result_url,
       server_url: server_url,
     };

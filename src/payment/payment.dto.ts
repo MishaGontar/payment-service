@@ -14,4 +14,8 @@ export class CreatePaymentDto {
   @IsString()
   @IsNotEmpty()
   orderId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
 }

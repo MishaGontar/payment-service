@@ -1,19 +1,21 @@
 import {
   Body,
   Controller,
-  Get, HttpCode,
-  HttpStatus, Post,
+  Get,
+  Post,
   Query,
   UsePipes,
-  ValidationPipe
+  ValidationPipe,
 } from "@nestjs/common";
 import { PaymentService } from "./payment.service";
 import { CreatePaymentDto } from "./payment.dto";
-import { MessagePattern, Payload } from "@nestjs/microservices";
+import { BasePaymentController } from "./base.payment.controller";
 
 @Controller("payment")
-export class PaymentController {
-  constructor(private paymentService: PaymentService) {}
+export class PaymentController extends BasePaymentController {
+  constructor(protected readonly paymentService: PaymentService) {
+    super(paymentService);
+  }
 
   @Get("create")
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -21,35 +23,8 @@ export class PaymentController {
     return await this.paymentService.createPaymentLink(query);
   }
 
-  @MessagePattern("createPayment")
-  async handleCreatePayment(@Payload() payload: CreatePaymentDto) {
-    return await this.paymentService.createPaymentLink(payload);
-  }
-
   @Post("callback")
-  @HttpCode(200)
-  async handleCallback(@Body() body: any) {
-    const { data, signature } = body;
-
-
-    const isValid = this.paymentService.validateSignature(data, signature);
-    if (!isValid) {
-      console.error("Invalid signature");
-      return { status: "error", message: "Invalid signature" };
-    }
-
-    const paymentInfo = JSON.parse(
-      Buffer.from(data, "base64").toString("utf8"),
-    );
-
-    console.log("Payment Info:", paymentInfo);
-
-    if (paymentInfo.status === "success") {
-      // Оновлюємо дані у БД або виконуємо іншу логіку
-      console.log("Status successul");
-      return { status: HttpStatus.OK };
-    }
-
-    return { status: HttpStatus.BAD_REQUEST };
+  async handleCallbackPay(@Body() body: any) {
+    return await this.handleCallback(body);
   }
 }
