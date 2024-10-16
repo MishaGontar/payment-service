@@ -1,52 +1,52 @@
-## Опис
+## Description
 
-Сервіс був створений для того, щоб можна було отримувати посилання на оплату та верифікувати транзакції після оплати
-користувачів.
+This service was created to generate payment links and verify transactions after users complete payments.
 
-## Конфігурація середовища (.env)
+## Environment Configuration (.env)
 
-Цей файл містить змінні для налаштування проєкту. Нижче подано опис кожної змінної у вигляді таблиці.
+This file contains variables required for project setup. Below is a table describing each variable.
 
-| Змінна                      | Опис                                                                              | Приклад значення                                  |
-|-----------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------|
-| `LIQPAY_PUBLIC_KEY`         | Публічний ключ для аутентифікації в LiqPay.                                       | `sandbox_public_key`                              |
-| `LIQPAY_PRIVATE_KEY`        | Приватний ключ для підпису запитів до LiqPay.                                     | `sandbox_private_key`                             |
-| `LIQPAY_SERVER_SUCCESS_URL` | URL для серверного підтвердження успішної оплати. (повинен бути доступний LiqPay) | `https://example.ngrok-free.app/payment/callback` |
-| `LIQPAY_RESULT_SUCCESS_URL` | URL для перенаправлення користувача після оплати.                                 | `https://www.instagram.com/`                      |
-| `PORT`                      | Порт для запуску сервера.                                                         | `4000`                                            |
-| `IS_MICROSERVICE`           | Вказує, чи є додаток мікросервісом (`true/false`).                                | `true`                                            |
-| `HOST`                      | Домен або IP-адреса, на якому розгорнуто сервер.                                  | `localhost`                                       |
+| Variable                    | Description                                                                   | Example Value                                     |
+|-----------------------------|-------------------------------------------------------------------------------|---------------------------------------------------|
+| `LIQPAY_PUBLIC_KEY`         | Public key for authentication with LiqPay.                                    | `sandbox_public_key`                              |
+| `LIQPAY_PRIVATE_KEY`        | Private key for signing requests to LiqPay.                                   | `sandbox_private_key`                             |
+| `LIQPAY_SERVER_SUCCESS_URL` | Server URL for confirming successful payments (must be accessible to LiqPay). | `https://example.ngrok-free.app/payment/callback` |
+| `LIQPAY_RESULT_SUCCESS_URL` | URL to redirect the user after successful payment.                            | `https://www.instagram.com/`                      |
+| `PORT`                      | Port on which the server will run.                                            | `4000`                                            |
+| `IS_MICROSERVICE`           | Indicates if the app is a microservice (`true/false`).                        | `true`                                            |
+| `HOST`                      | Domain or IP address where the server is deployed.                            | `localhost`                                       |
 
-## Опис API
+## API Description
 
-Цей документ описує API для керування платежами через звичайний HTTP-сервер та мікросервісну архітектуру.
+This document outlines the API for handling payments through both a standard HTTP server and a microservice
+architecture.
 
-### Таблиця ендпоінтів
+### Endpoints Table
 
-| Метод | URL                 | Опис                                                    | DTO / Параметри            |
-|-------|---------------------|---------------------------------------------------------|----------------------------|
-| GET   | `/payment/create`   | Створює платіжне посилання на основі параметрів запиту. | `CreatePaymentDto` (Query) |
-| POST  | `/payment/callback` | Обробляє callback-запит після успішної оплати.          | `Body: any`                |
+| Method | URL                 | Description                                            | DTO / Parameters           |
+|--------|---------------------|--------------------------------------------------------|----------------------------|
+| GET    | `/payment/create`   | Creates a payment link based on query parameters.      | `CreatePaymentDto` (Query) |
+| POST   | `/payment/callback` | Handles the callback request after successful payment. | `Body: any`                |
 
-### Опис
+### Description
 
-- **`createPayment`**: Використовується для генерації посилання для оплати на основі запиту користувача.
-- **`handleCallbackPay`**: Приймає callback-запити від LiqPay для підтвердження виконання транзакції.
+- **`createPayment`**: Generates a payment link based on the user’s request.
+- **`handleCallbackPay`**: Processes callback requests from LiqPay to confirm transactions.
 
-### Поля `CreatePaymentDto`
+### `CreatePaymentDto` Fields
 
-| Поле          | Тип      | Опис                                 | Валідація                                | Приклад значення                  |
-|---------------|----------|--------------------------------------|------------------------------------------|-----------------------------------|
-| `amount`      | `number` | Сума для оплати.                     | Має бути числом, не менше 1 (`@Min(1)`). | `150.50`                          |
-| `currency`    | `string` | Валюта, в якій здійснюється оплата.  | Не може бути порожнім (`@IsNotEmpty`).   | `"USD"`                           |
-| `orderId`     | `string` | Унікальний ідентифікатор замовлення. | Не може бути порожнім (`@IsNotEmpty`).   | `"ORD12345"`                      |
-| `description` | `string` | Опис товару або послуги.             | Не може бути порожнім (`@IsNotEmpty`).   | `"Оплата за курси програмування"` |
+| Field         | Type     | Description                            | Validation                                | Example Value                       |
+|---------------|----------|----------------------------------------|-------------------------------------------|-------------------------------------|
+| `amount`      | `number` | Payment amount.                        | Must be a number, at least 1 (`@Min(1)`). | `150.50`                            |
+| `currency`    | `string` | Currency for the payment.              | Cannot be empty (`@IsNotEmpty`).          | `"USD"`                             |
+| `orderId`     | `string` | Unique order identifier.               | Cannot be empty (`@IsNotEmpty`).          | `"ORD12345"`                        |
+| `description` | `string` | Description of the product or service. | Cannot be empty (`@IsNotEmpty`).          | `"Payment for programming courses"` |
 
-##№ Локальний запуск
+## Local Setup
 
-Для локального запуску необхідно встановити та налаштувати **ngrok** для пробросу вашого локального сервера в інтернет.
+To run the project locally, you need to install and configure **ngrok** to expose your local server to the internet.
 
-1. Встановіть **ngrok** з [офіційного сайту](https://ngrok.com/).
-2. Запустіть ngrok командою:
+1. Install **ngrok** from the [official website](https://ngrok.com/).
+2. Start ngrok with the following command:
    ```bash
-   npm run start:dev:online
+   ngrok http 3003
